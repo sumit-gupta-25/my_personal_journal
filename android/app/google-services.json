@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "852749702030",
+    "project_id": "my-personal-journal-2161b",
+    "storage_bucket": "my-personal-journal-2161b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852749702030:android:f1632841652982b7f04adf",
+        "android_client_info": {
+          "package_name": "com.example.my_personal_journal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANwpIG4wEuyAJ54UuoKSwpMafR3YEf2bE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
