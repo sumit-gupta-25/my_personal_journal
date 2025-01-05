@@ -64,6 +64,10 @@ class _MyRegisterState extends State<MyRegister> {
                                 hintStyle: TextStyle(color: Color(0xFFF8F8F8)),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.person,
+                                  color: Color(0xFFF8F8F8),
                                 )),
                           ),
                           SizedBox(
@@ -89,6 +93,10 @@ class _MyRegisterState extends State<MyRegister> {
                                 hintStyle: TextStyle(color: Color(0xFFF8F8F8)),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.email,
+                                  color: Color(0xFFF8F8F8),
                                 )),
                           ),
                           SizedBox(
@@ -115,6 +123,10 @@ class _MyRegisterState extends State<MyRegister> {
                                 hintStyle: TextStyle(color: Color(0xFFF8F8F8)),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.email,
+                                  color: Color(0xFFF8F8F8),
                                 )),
                           ),
                           SizedBox(
@@ -142,7 +154,7 @@ class _MyRegisterState extends State<MyRegister> {
                                               password:
                                                   _passwordTextController.text)
                                           .then((value) {
-                                        print("Created New Account");
+                                        // ignore: use_build_context_synchronously
                                         Navigator.pushNamed(context, 'home');
                                       });
                                     },

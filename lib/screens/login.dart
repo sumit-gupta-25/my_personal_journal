@@ -62,6 +62,10 @@ class _MyLoginState extends State<MyLogin> {
                                 hintStyle: TextStyle(color: Color(0xFFF8F8F8)),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.email,
+                                  color: Color(0xFFF8F8F8),
                                 )),
                           ),
                           SizedBox(
@@ -88,6 +92,10 @@ class _MyLoginState extends State<MyLogin> {
                                 hintStyle: TextStyle(color: Color(0xFFF8F8F8)),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.lock,
+                                  color: Color(0xFFF8F8F8),
                                 )),
                           ),
                           SizedBox(
@@ -115,7 +123,7 @@ class _MyLoginState extends State<MyLogin> {
                                               password:
                                                   _passwordTextController.text)
                                           .then((value) {
-                                        print("Login Successful");
+                                        // ignore: use_build_context_synchronously
                                         Navigator.pushNamed(context, 'home');
                                       });
                                     },
@@ -129,7 +137,6 @@ class _MyLoginState extends State<MyLogin> {
                             height: 40,
                           ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               TextButton(
                                 onPressed: () {
@@ -138,20 +145,11 @@ class _MyLoginState extends State<MyLogin> {
                                 style: ButtonStyle(),
                                 child: Text(
                                   'Sign Up',
-                                  textAlign: TextAlign.left,
+                                  textAlign: TextAlign.right,
                                   style: TextStyle(
                                       color: Color(0xFFF8F8F8), fontSize: 18),
                                 ),
                               ),
-                              TextButton(
-                                  onPressed: () {},
-                                  child: Text(
-                                    'Forgot Password',
-                                    style: TextStyle(
-                                      color: Color(0xFFF8F8F8),
-                                      fontSize: 18,
-                                    ),
-                                  )),
                             ],
                           )
                         ],
