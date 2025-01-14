@@ -6,11 +6,10 @@ class MyDiary extends StatefulWidget {
   const MyDiary({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _MyDiaryState createState() => _MyDiaryState();
+  MyDiaryState createState() => MyDiaryState();
 }
 
-class _MyDiaryState extends State<MyDiary> {
+class MyDiaryState extends State<MyDiary> {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
   @override
@@ -48,29 +47,24 @@ class _MyDiaryState extends State<MyDiary> {
                 child: Container(
                   height: 575,
                   width: 350,
-                  padding:
-                      EdgeInsets.all(20), // Adjust padding for internal spacing
+                  padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image:
                           AssetImage('assets/datebg1.jpeg'), // Background image
                       fit: BoxFit.cover,
                     ),
-                    borderRadius:
-                        BorderRadius.circular(15), // Optional rounded corners
+                    borderRadius: BorderRadius.circular(15),
                   ),
                   child: Column(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center, // Center contents vertically
-                    crossAxisAlignment: CrossAxisAlignment
-                        .center, // Center contents horizontally
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         'Select Date',
                         style: TextStyle(fontSize: 20, color: Colors.brown),
                       ),
-                      SizedBox(
-                          height: 10), // Spacing between title and calendar
+                      SizedBox(height: 10),
                       TableCalendar(
                         firstDay: DateTime(2025),
                         lastDay: DateTime(2030),
@@ -81,7 +75,7 @@ class _MyDiaryState extends State<MyDiary> {
                         onDaySelected: (selectedDay, focusedDay) {
                           setState(() {
                             _selectedDay = selectedDay;
-                            _focusedDay = focusedDay; // Update focused day
+                            _focusedDay = focusedDay;
                           });
                           print(
                               'Date selected: ${selectedDay.day}-${selectedDay.month}-${selectedDay.year}');

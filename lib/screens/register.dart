@@ -5,11 +5,10 @@ class MyRegister extends StatefulWidget {
   const MyRegister({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _MyRegisterState createState() => _MyRegisterState();
+  MyRegisterState createState() => MyRegisterState();
 }
 
-class _MyRegisterState extends State<MyRegister> {
+class MyRegisterState extends State<MyRegister> {
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
   @override

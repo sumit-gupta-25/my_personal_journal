@@ -1,173 +1,30 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:my_personal_journal/service/database.dart';
 import 'package:my_personal_journal/widgets/navigatordrawer.dart' as custom;
-import 'package:image_picker/image_picker.dart';
+import 'package:my_personal_journal/widgets/imagepicker.dart';
 import 'dart:io';
+import 'package:random_string/random_string.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MyHome extends StatefulWidget {
   const MyHome({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _MyHomeState createState() => _MyHomeState();
+  MyHomeState createState() => MyHomeState();
 }
 
-class _MyHomeState extends State<MyHome> {
+class MyHomeState extends State<MyHome> {
   File? _image;
-  final picker = ImagePicker();
-  bool _isFavorite = false;
-  final TextEditingController _textController = TextEditingController();
 
-  Future openDialog(BuildContext context) => showDialog(
-        context: context,
-        builder: (context) {
-          File? dialogImage = _image; // Local reference for dialog state
-          return StatefulBuilder(
-            builder: (context, setStateDialog) => AlertDialog(
-              contentPadding: EdgeInsets.zero,
-              backgroundColor: Colors.transparent,
-              content: Container(
-                width: 300,
-                height: 400,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/imagebg.png'),
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: EdgeInsets.only(left: 30, top: 50, right: 30),
-                child: Column(
-                  children: [
-                    InkWell(
-                      onTap: () async {
-                        final pickedFile = await picker.pickImage(
-                          source: ImageSource.gallery,
-                          imageQuality: 80,
-                        );
-                        if (pickedFile != null) {
-                          setState(() {
-                            _image = File(pickedFile.path); // Update global
-                          });
-                          setStateDialog(() {
-                            dialogImage =
-                                File(pickedFile.path); // Update dialog
-                          });
-                        } else {
-                          print('No image picked');
-                        }
-                      },
-                      child: Container(
-                        height: 200,
-                        width: 300,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white),
-                        ),
-                        child: dialogImage != null
-                            ? Image.file(
-                                dialogImage!.absolute,
-                                fit: BoxFit.cover,
-                              )
-                            : Center(
-                                child: Icon(
-                                  Icons.add_a_photo_outlined,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                              ),
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      "Upload Image",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    // Buttons at the bottom
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Cancel button
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Close the dialog
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.brown,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          icon: const Icon(
-                            Icons.cancel_outlined,
-                            color: Color(0xFFF5F5DC),
-                          ),
-                          label: const Text(
-                            'Cancel',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFFF5F5DC),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        // Submit button
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            // You can handle the submit action here
-                            // For example, save the image or trigger further actions
-                            Navigator.of(context).pop(); // Close the dialog
-                            print('Image submitted: ${dialogImage?.path}');
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.brown,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          icon: const Icon(
-                            Icons.upload,
-                            color: Color(0xFFF5F5DC),
-                          ),
-                          label: const Text(
-                            'Upload',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFFF5F5DC),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      );
-
-  Future getImageGallery() async {
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
+  // Method to handle the image after it's picked
+  void _onImagePicked(File? image) {
     setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-        // widget.imgUrl = null;
-      } else {
-        print('No image pucked');
-      }
+      _image = image;
     });
   }
+
+  final TextEditingController _textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -254,24 +111,6 @@ class _MyHomeState extends State<MyHome> {
                         ),
                       ),
                     ),
-                    Positioned(
-                      bottom: -2,
-                      left: 15,
-                      child: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isFavorite =
-                                !_isFavorite; // Toggle favorite status
-                          });
-                        },
-                        icon: Icon(
-                          Icons.favorite,
-                          color: _isFavorite
-                              ? Colors.red
-                              : Colors.grey, // Change color
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -284,9 +123,21 @@ class _MyHomeState extends State<MyHome> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    _image != null
+                        ? Text(
+                            'Photo uploaded successfully!',
+                            style: TextStyle(color: Colors.green, fontSize: 16),
+                          )
+                        : Text(
+                            'No photo uploaded yet.',
+                            style: TextStyle(color: Colors.red, fontSize: 16),
+                          ),
+                    SizedBox(
+                      height: 5,
+                    ),
                     ElevatedButton.icon(
                       onPressed: () {
-                        openDialog(context);
+                        ImagePickerLogic.openDialog(context, _onImagePicked);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.brown,
@@ -309,32 +160,6 @@ class _MyHomeState extends State<MyHome> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      icon: const Icon(
-                        Icons.backup_outlined,
-                        color: Color(0xFFF5F5DC),
-                      ),
-                      label: const Text(
-                        'Backup',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFFF5F5DC),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -342,8 +167,7 @@ class _MyHomeState extends State<MyHome> {
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding:
-                    const EdgeInsets.only(bottom: 20), // Add padding if needed
+                padding: const EdgeInsets.only(bottom: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -372,9 +196,40 @@ class _MyHomeState extends State<MyHome> {
                         ),
                       ),
                     ),
+                    SizedBox(
+                      height: 5,
+                    ),
                     ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pushNamed(context, 'favourite');
+                      onPressed: () async {
+                        if (_image != null) {
+                          // Convert image to bytes
+                          final imageBytes = await _image!.readAsBytes();
+
+                          // Generate a unique ID for the journal
+                          String id = randomAlphaNumeric(10);
+
+                          Map<String, dynamic> journalMap = {
+                            "Content": _textController.text,
+                            "Id": id,
+                            "ImageBytes": imageBytes,
+                            "Timestamp": FieldValue.serverTimestamp(),
+                          };
+
+                          // Save to Firestore using DatabaseMethods
+                          await DatabaseMethods()
+                              .addJournal(journalMap, id, imageBytes)
+                              .then((value) {
+                            Fluttertoast.showToast(
+                              msg: "Journal backup Successful",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.brown,
+                              textColor: Colors.white,
+                              fontSize: 16.0,
+                            );
+                          });
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.brown,
@@ -385,18 +240,18 @@ class _MyHomeState extends State<MyHome> {
                         ),
                       ),
                       icon: const Icon(
-                        Icons.favorite,
+                        Icons.backup_outlined,
                         color: Color(0xFFF5F5DC),
                       ),
                       label: const Text(
-                        'Favourites',
+                        'Backup',
                         style: TextStyle(
                           fontSize: 16,
                           color: Color(0xFFF5F5DC),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),

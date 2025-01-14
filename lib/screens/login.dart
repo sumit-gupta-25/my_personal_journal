@@ -5,11 +5,10 @@ class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _MyLoginState createState() => _MyLoginState();
+  MyLoginState createState() => MyLoginState();
 }
 
-class _MyLoginState extends State<MyLogin> {
+class MyLoginState extends State<MyLogin> {
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
   @override
@@ -74,7 +73,7 @@ class _MyLoginState extends State<MyLogin> {
                           TextField(
                             controller: _passwordTextController,
                             style: TextStyle(color: Color(0xFFF8F8F8)),
-                            obscureText: true,
+                            obscureText: true, //to hide the password
                             decoration: InputDecoration(
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
