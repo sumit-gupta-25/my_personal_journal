@@ -25,10 +25,27 @@ class NavigationDrawer extends StatelessWidget {
       ));
 
   Widget buildHeader(BuildContext context) => Container(
-        padding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top,
-        ),
-      );
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top,
+      ),
+      child: Column(
+        children: const [
+          Image(
+              image: AssetImage("assets/hand&quill.png"),
+              width: 300,
+              height: 300),
+          Text(
+            'Personal Journal',
+            style: TextStyle(
+              color: Color(0xFFF5F5DC),
+              fontSize: 28,
+              fontStyle: FontStyle.italic,
+              decoration: TextDecoration.underline,
+              decorationColor: Color(0xFFF5F5DC),
+            ),
+          ),
+        ],
+      ));
 
   Widget buildMenuItems(BuildContext context) => Container(
         padding: const EdgeInsets.all(24),
@@ -39,13 +56,13 @@ class NavigationDrawer extends StatelessWidget {
               leading: const Icon(
                 Icons.home_outlined,
                 color: Color(0xFFF5F5DC),
-                size: 26,
+                size: 25,
               ),
               title: Text(
                 'Home',
                 style: TextStyle(
                   color: Color(0xFFF5F5DC),
-                  fontSize: 26,
+                  fontSize: 25,
                 ),
               ),
               onTap: () {
@@ -54,15 +71,32 @@ class NavigationDrawer extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(
+                Icons.help_outline_outlined,
+                color: Color(0xFFF5F5DC),
+                size: 25,
+              ),
+              title: Text(
+                'Help & Support',
+                style: TextStyle(
+                  color: Color(0xFFF5F5DC),
+                  fontSize: 25,
+                ),
+              ),
+              onTap: () {
+                Navigator.pushNamed(context, 'help');
+              },
+            ),
+            ListTile(
+              leading: const Icon(
                 Icons.logout_outlined,
                 color: Color(0xFFF5F5DC),
-                size: 26,
+                size: 25,
               ),
               title: Text(
                 'Logout',
                 style: TextStyle(
                   color: Color(0xFFF5F5DC),
-                  fontSize: 26,
+                  fontSize: 25,
                 ),
               ),
               onTap: () {

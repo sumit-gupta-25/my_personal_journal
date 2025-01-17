@@ -4,6 +4,7 @@ import 'package:my_personal_journal/screens/login.dart';
 import 'package:my_personal_journal/screens/register.dart';
 import 'package:my_personal_journal/screens/home.dart';
 import 'package:my_personal_journal/screens/mydiary.dart';
+import 'package:my_personal_journal/screens/help.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,7 @@ void main() async {
       'login': (context) => MyLogin(),
       'home': (context) => MyHome(),
       'mydiary': (context) => MyDiary(),
+      'help': (context) => Help(),
     },
   ));
 }

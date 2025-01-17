@@ -11,6 +11,7 @@ class MyLogin extends StatefulWidget {
 class MyLoginState extends State<MyLogin> {
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
+  String _errorMessage = '';
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,7 +23,6 @@ class MyLoginState extends State<MyLogin> {
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
-            Container(),
             Container(
               padding: EdgeInsets.only(left: 35, top: 130),
               child: Text(
@@ -98,6 +98,14 @@ class MyLoginState extends State<MyLogin> {
                                 )),
                           ),
                           SizedBox(
+                            height: 10,
+                          ),
+                          if (_errorMessage.isNotEmpty)
+                            Text(
+                              _errorMessage,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          SizedBox(
                             height: 40,
                           ),
                           Row(
@@ -115,16 +123,25 @@ class MyLoginState extends State<MyLogin> {
                                 backgroundColor: Colors.brown,
                                 child: IconButton(
                                     color: Color(0xFFF8F8F8),
-                                    onPressed: () {
-                                      FirebaseAuth.instance
-                                          .signInWithEmailAndPassword(
-                                              email: _emailTextController.text,
-                                              password:
-                                                  _passwordTextController.text)
-                                          .then((value) {
-                                        // ignore: use_build_context_synchronously
-                                        Navigator.pushNamed(context, 'home');
-                                      });
+                                    onPressed: () async {
+                                      try {
+                                        await FirebaseAuth.instance
+                                            .signInWithEmailAndPassword(
+                                                email:
+                                                    _emailTextController.text,
+                                                password:
+                                                    _passwordTextController
+                                                        .text);
+
+                                        if (mounted) {
+                                          Navigator.pushNamed(context, 'home');
+                                        }
+                                      } on FirebaseAuthException catch (e) {
+                                        setState(() {
+                                          _errorMessage =
+                                              "Login failed: ${e.message}";
+                                        });
+                                      }
                                     },
                                     icon: Icon(
                                       Icons.arrow_forward,

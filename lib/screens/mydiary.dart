@@ -1,6 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:my_personal_journal/screens/myjournal.dart';
 import 'package:my_personal_journal/widgets/navigatordrawer.dart' as custom;
-import 'package:table_calendar/table_calendar.dart';
 
 class MyDiary extends StatefulWidget {
   const MyDiary({super.key});
@@ -10,104 +11,117 @@ class MyDiary extends StatefulWidget {
 }
 
 class MyDiaryState extends State<MyDiary> {
-  DateTime _selectedDay = DateTime.now();
-  DateTime _focusedDay = DateTime.now();
+  DateTime? selectedDate;
+
+  //Date Picker
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/favouritebg.jpeg'), fit: BoxFit.cover),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+            image: AssetImage('assets/mydiarybg.jpeg'), fit: BoxFit.cover),
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('My Diary'),
+          centerTitle: true,
+          foregroundColor: Color(0xFFF5F5DC),
+          backgroundColor: Colors.brown,
         ),
-        child: Scaffold(
-            appBar: AppBar(
-              title: Text('My Diary'),
-              centerTitle: true,
-              foregroundColor: Color(0xFFF5F5DC),
-              backgroundColor: Colors.brown,
-            ),
-            drawer: const custom.NavigationDrawer(),
-            backgroundColor: Colors.transparent,
-            body: Stack(children: [
-              Container(
-                padding: EdgeInsets.only(left: 20, top: 20, right: 35),
-                child: Text(
-                  '"Let Your Diary Carry\nWhat Burdens You..."',
+        drawer: const custom.NavigationDrawer(),
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                  selectedDate == null
+                      ? 'No date selected!'
+                      : 'Selected Date: ${selectedDate!.toLocal()}'
+                          .split(' ')[0],
                   style: TextStyle(
                     color: Color(0xFFF5F5DC),
-                    fontSize: 30,
-                    fontStyle: FontStyle.italic,
-                    decoration: TextDecoration.underline,
-                    decorationColor: Colors.brown,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  )),
+              SizedBox(height: 20.0),
+              ElevatedButton.icon(
+                onPressed: () => _selectDate(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.brown,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(
+                  Icons.date_range_outlined,
+                  color: Color(0xFFF5F5DC),
+                ),
+                label: const Text(
+                  'Select Date',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFFF5F5DC),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  height: 575,
-                  width: 350,
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image:
-                          AssetImage('assets/datebg1.jpeg'), // Background image
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Select Date',
-                        style: TextStyle(fontSize: 20, color: Colors.brown),
-                      ),
-                      SizedBox(height: 10),
-                      TableCalendar(
-                        firstDay: DateTime(2025),
-                        lastDay: DateTime(2030),
-                        focusedDay: _focusedDay,
-                        selectedDayPredicate: (day) {
-                          return isSameDay(_selectedDay, day);
-                        },
-                        onDaySelected: (selectedDay, focusedDay) {
-                          setState(() {
-                            _selectedDay = selectedDay;
-                            _focusedDay = focusedDay;
-                          });
-                          print(
-                              'Date selected: ${selectedDay.day}-${selectedDay.month}-${selectedDay.year}');
-                        },
-                        calendarStyle: CalendarStyle(
-                          todayDecoration: BoxDecoration(
-                            color: Colors.brown,
-                            shape: BoxShape.circle,
+              SizedBox(height: 20.0),
+              ElevatedButton.icon(
+                onPressed: selectedDate == null
+                    ? null
+                    : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyJournalScreen(
+                              selectedDate: selectedDate!,
+                              userId: FirebaseAuth.instance.currentUser!.uid,
+                            ),
                           ),
-                          selectedDecoration: BoxDecoration(
-                            color: Color(0xFFF5F5DC),
-                            shape: BoxShape.circle,
-                          ),
-                          selectedTextStyle: TextStyle(color: Colors.black),
-                          weekendTextStyle: TextStyle(color: Colors.red),
-                        ),
-                        headerStyle: HeaderStyle(
-                          formatButtonVisible: false,
-                          titleCentered: true,
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF5F5DC),
-                          ),
-                          titleTextStyle: TextStyle(
-                            color: Colors.brown,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
+                        );
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.brown,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              )
-            ])));
+                icon: const Icon(
+                  Icons.library_books_outlined,
+                  color: Color(0xFFF5F5DC),
+                ),
+                label: const Text(
+                  'View Journal',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFFF5F5DC),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

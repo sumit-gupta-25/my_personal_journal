@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_personal_journal/service/database.dart';
 import 'package:my_personal_journal/widgets/navigatordrawer.dart' as custom;
 import 'package:my_personal_journal/widgets/imagepicker.dart';
 import 'dart:io';
-import 'package:random_string/random_string.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:random_string/random_string.dart';
 
 class MyHome extends StatefulWidget {
   const MyHome({super.key});
@@ -17,7 +18,6 @@ class MyHome extends StatefulWidget {
 class MyHomeState extends State<MyHome> {
   File? _image;
 
-  // Method to handle the image after it's picked
   void _onImagePicked(File? image) {
     setState(() {
       _image = image;
@@ -82,8 +82,7 @@ class MyHomeState extends State<MyHome> {
                           return Text(
                             '$currentLength / $maxLength',
                             style: TextStyle(
-                              color: Colors
-                                  .white, // Set the counter color to white
+                              color: Colors.white,
                             ),
                           );
                         },
@@ -201,34 +200,74 @@ class MyHomeState extends State<MyHome> {
                     ),
                     ElevatedButton.icon(
                       onPressed: () async {
-                        if (_image != null) {
-                          // Convert image to bytes
-                          final imageBytes = await _image!.readAsBytes();
+                        if (_image != null && _textController.text.isNotEmpty) {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext context) {
+                              return Center(child: CircularProgressIndicator());
+                            },
+                          );
 
-                          // Generate a unique ID for the journal
-                          String id = randomAlphaNumeric(10);
+                          try {
+                            // Convert image to bytes
+                            final imageBytes = await _image!.readAsBytes();
 
-                          Map<String, dynamic> journalMap = {
-                            "Content": _textController.text,
-                            "Id": id,
-                            "ImageBytes": imageBytes,
-                            "Timestamp": FieldValue.serverTimestamp(),
-                          };
+                            String userId =
+                                FirebaseAuth.instance.currentUser!.uid;
 
-                          // Save to Firestore using DatabaseMethods
-                          await DatabaseMethods()
-                              .addJournal(journalMap, id, imageBytes)
-                              .then((value) {
+                            // Create a unique ID for the journal entry
+                            String journalId = randomAlphaNumeric(10);
+
+                            // Format the current date
+                            String formattedDate =
+                                "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
+
+                            // Map to store journal details
+                            Map<String, dynamic> journalMap = {
+                              "Content": _textController.text,
+                              "JournalId": journalId,
+                              "ImageBytes": imageBytes,
+                              "Timestamp": FieldValue.serverTimestamp(),
+                              "date": formattedDate,
+                            };
+
+                            // Save to Firestore using DatabaseMethods
+                            await DatabaseMethods()
+                                .addJournal(journalMap, userId, null);
+
+                            // To close the loading dialog and Succesful toast message
+                            Navigator.of(context).pop();
+
                             Fluttertoast.showToast(
-                              msg: "Journal backup Successful",
+                              msg: "Journal backup successful!",
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.brown,
+                              backgroundColor: Colors.green,
                               textColor: Colors.white,
                               fontSize: 16.0,
                             );
-                          });
+                          } catch (e) {
+                            // To close the loading dialog and Error toast message
+                            Navigator.of(context).pop();
+                            Fluttertoast.showToast(
+                              msg: "Error: ${e.toString()}",
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.CENTER,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0,
+                            );
+                          }
+                        } else {
+                          Fluttertoast.showToast(
+                            msg: "Please enter content and upload an image.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
                         }
                       },
                       style: ElevatedButton.styleFrom(
