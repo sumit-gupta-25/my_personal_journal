@@ -5,7 +5,7 @@ class Help extends StatelessWidget {
     {
       'question': 'How do I create a new journal entry?',
       'answer':
-          'To create a new journal entry, follow these steps:\n1. Navigate to the home screen.\n2. Use the text field to write your thoughts.\n3. Click on the "Upload Image" button to add a photo.\n4. Click on the "Backup" button to save your entry to the cloud.',
+          'To create a new journal entry, follow these steps:\n1. Navigate to the home screen.\n2. Use the text field to write your thoughts.\n3. Click on the "Upload Image" button to add a photo.\n4. Click on the "Save" button to save your entry to the cloud.',
     },
     {
       'question': 'How do I view my saved journal entries?',

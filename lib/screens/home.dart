@@ -240,7 +240,7 @@ class MyHomeState extends State<MyHome> {
                             Navigator.of(context).pop();
 
                             Fluttertoast.showToast(
-                              msg: "Journal backup successful!",
+                              msg: "Journal saved successfully!",
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.CENTER,
                               backgroundColor: Colors.green,
@@ -283,7 +283,7 @@ class MyHomeState extends State<MyHome> {
                         color: Color(0xFFF5F5DC),
                       ),
                       label: const Text(
-                        'Backup',
+                        'Save',
                         style: TextStyle(
                           fontSize: 16,
                           color: Color(0xFFF5F5DC),
