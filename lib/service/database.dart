@@ -2,18 +2,24 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseMethods {
-  Future<void> addJournal(Map<String, dynamic> journalMap, String userId,
-      Uint8List? imageBytes) async {
+  Future<void> addJournal(
+    Map<String, dynamic> journalMap,
+    String userId,
+    Uint8List? imageBytes,
+  ) async {
+    // Make sure the userId is included in the document
+    journalMap['userId'] = userId;
+
     if (imageBytes != null) {
       journalMap['ImageBytes'] = imageBytes;
     }
 
-    String formattedDate = journalMap['date']; // Example: "2025-01-01"
+    String formattedDate = journalMap['date'];
 
     await FirebaseFirestore.instance
         .collection("Users")
         .doc(userId)
-        .collection("journals") // Subcollection (journal entries)
+        .collection("journals")
         .doc(formattedDate)
         .set(journalMap);
   }
