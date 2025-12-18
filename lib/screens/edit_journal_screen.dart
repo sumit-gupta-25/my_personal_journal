@@ -57,22 +57,24 @@ class _EditJournalScreenState extends State<EditJournalScreen> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.brown[400],
-              ),
-              onPressed: () async {
-                await DatabaseMethods().updateJournal(
-                  widget.userId,
-                  widget.journalId,
-                  {
-                    "Content": _controller.text,
-                  },
-                );
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.brown[400],
+                ),
+                onPressed: () async {
+                  await DatabaseMethods().updateJournal(
+                    widget.userId,
+                    widget.journalId,
+                    {
+                      "Content": _controller.text,
+                    },
+                  );
 
-                Navigator.pop(context, true); // Return success
-              },
-              child: const Text("Save"),
-            )
+                  Navigator.pop(context, true); // Return success
+                },
+                child: const Text(
+                  "Save",
+                  style: TextStyle(color: Color(0xFFF5F5DC)),
+                ))
           ],
         ),
       ),

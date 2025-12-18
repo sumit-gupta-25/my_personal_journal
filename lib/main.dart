@@ -6,9 +6,15 @@ import 'package:my_personal_journal/screens/home.dart';
 import 'package:my_personal_journal/screens/mydiary.dart';
 import 'package:my_personal_journal/screens/help.dart';
 
+import 'firebase_options.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     home: MyLogin(),
