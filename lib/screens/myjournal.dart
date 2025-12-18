@@ -42,115 +42,109 @@ class MyJournalScreen extends StatelessWidget {
         foregroundColor: Color(0xFFF5F5DC),
         backgroundColor: Colors.brown,
       ),
-      body: FutureBuilder<Map<String, dynamic>?>(
-        future: _fetchJournalEntry(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 500,
+          ),
+          child: FutureBuilder<Map<String, dynamic>?>(
+            future: _fetchJournalEntry(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          final data = snapshot.data;
+              if (snapshot.hasError) {
+                return Center(child: Text("Error: ${snapshot.error}"));
+              }
 
-          return Column(
-            children: [
-              Expanded(
-                child: data == null
-                    ? const Center(
-                        child: Text(
-                          'No entry found for this date.',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      )
-                    : _buildJournalContent(data),
-              ),
+              final data = snapshot.data;
 
-              /// ======================
-              /// BUTTON SECTION
-              /// ======================
-              Padding(
+              if (data == null) {
+                return const Center(
+                  child: Text(
+                    "No entry found for this date.",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                );
+              }
+
+              return Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: data == null
-                    ? ElevatedButton(
-                        onPressed: () async {
-                          Map<String, dynamic> newEntry = {
-                            "date": formattedDate,
-                            "Content": "Write something...",
-                            "userId": userId,
-                          };
-
-                          await DatabaseMethods().addJournal(
-                            newEntry,
-                            userId,
-                            null,
-                          );
-
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            _buildJournalContent(data),
+                            const SizedBox(height: 20),
+                          ],
                         ),
-                        child: const Text("Add Entry"),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // UPDATE BUTTON
-                          ElevatedButton(
-                              onPressed: () async {
-                                final updated = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => EditJournalScreen(
-                                      userId: userId,
-                                      journalId: formattedDate,
-                                      existingContent: data["Content"] ?? "",
-                                    ),
-                                  ),
-                                );
-
-                                // Refresh page after editing
-                                if (updated == true) {
-                                  Navigator.pop(context);
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.brown[400],
-                              ),
-                              child: const Text(
-                                "Update",
-                                style: TextStyle(color: Color(0xFFF5F5DC)),
-                              )),
-
-                          // DELETE BUTTON
-                          ElevatedButton(
-                              onPressed: () async {
-                                await DatabaseMethods()
-                                    .deleteJournal(userId, formattedDate);
-                                Navigator.pop(context);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.brown[400],
-                              ),
-                              child: const Text(
-                                "Delete",
-                                style: TextStyle(color: Color(0xFFF5F5DC)),
-                              )),
-                        ],
                       ),
-              ),
-            ],
-          );
-        },
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // UPDATE BUTTON
+                        ElevatedButton(
+                          onPressed: () async {
+                            final updated = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => EditJournalScreen(
+                                  userId: userId,
+                                  journalId: formattedDate,
+                                  existingContent: data["Content"] ?? "",
+                                ),
+                              ),
+                            );
+
+                            if (updated == true) {
+                              Navigator.pop(context);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.brown[400],
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 12),
+                          ),
+                          child: const Text(
+                            "Update",
+                            style: TextStyle(color: Color(0xFFF5F5DC)),
+                          ),
+                        ),
+
+                        // DELETE BUTTON
+                        ElevatedButton(
+                          onPressed: () async {
+                            await DatabaseMethods()
+                                .deleteJournal(userId, formattedDate);
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.brown[400],
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 12),
+                          ),
+                          child: const Text(
+                            "Delete",
+                            style: TextStyle(color: Color(0xFFF5F5DC)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
 
-  /// ==========================
-  /// JOURNAL CONTENT WIDGET
-  /// ==========================
   Widget _buildJournalContent(Map<String, dynamic> data) {
     final String content = data['Content'] ?? 'No content available';
 
@@ -158,44 +152,48 @@ class MyJournalScreen extends StatelessWidget {
     final Uint8List? imageBytes =
         imageList != null ? Uint8List.fromList(imageList.cast<int>()) : null;
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              height: 500,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                image: const DecorationImage(
-                  image: AssetImage('assets/textbg.jpeg'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Text(
-                content,
-                style: const TextStyle(
-                  color: Color(0xFFF5F5DC),
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // TEXT BOX
+        Container(
+          padding: const EdgeInsets.all(10),
+          height: 400,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            image: const DecorationImage(
+              image: AssetImage('assets/textbg.jpeg'),
+              fit: BoxFit.cover,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: SingleChildScrollView(
+            child: Text(
+              content,
+              style: const TextStyle(
+                color: Color(0xFFF5F5DC),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 20),
-            imageBytes != null
-                ? Image.memory(
-                    imageBytes,
-                    fit: BoxFit.contain,
-                    width: double.infinity,
-                    height: 200,
-                  )
-                : const Text("No image available for this entry."),
-          ],
+          ),
         ),
-      ),
+
+        const SizedBox(height: 20),
+
+        // IMAGE
+        imageBytes != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.memory(
+                  imageBytes,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 200,
+                ),
+              )
+            : const Text("No image available for this entry."),
+      ],
     );
   }
 }

@@ -5,42 +5,41 @@ class Help extends StatelessWidget {
     {
       'question': 'How do I create a new journal entry?',
       'answer':
-          'To create a new journal entry, follow these steps:\n1. Navigate to the home screen.\n2. Use the text field to write your thoughts.\n3. Click on the "Upload Image" button to add a photo.\n4. Click on the "Save" button to save your entry to the cloud.',
+          'To create a new journal entry:\n1. Go to the home screen.\n2. Write your thoughts in the text box.\n3. Upload an image.\n4. Tap "Save" to store it in the cloud.',
     },
     {
       'question': 'How do I view my saved journal entries?',
       'answer':
-          'Tap on the "My Diary" button at the bottom of the home screen.\nThis will navigate you to a screen where you can select the date and view your journal stored on the selected date.',
+          'Tap the "My Diary" button on the home screen.\nSelect a date to view your entry saved on that day.',
     },
     {
-      'question': 'How do I upload an image to my journal entry?',
+      'question': 'How do I upload an image?',
       'answer':
-          'Tap the "Upload Image" button on the home screen.\nSelect an image from your gallery.\nThe selected image will be attached to your journal entry.',
+          'Tap the "Upload Image" button, select an image from your device, and it will attach to your journal entry.',
     },
     {
       'question': 'What happens if I lose my device?',
       'answer':
-          'Since your journal entries are backed up to the cloud, you can log in from any device to access your entries.',
+          'Your entries are stored in Firebase Cloud.\nLog in from any device to access them again.',
     },
     {
       'question': 'How is my data secured?',
       'answer':
-          'Your data is stored securely in Firebase Firestore and is only accessible to you through your authenticated account.',
+          'Your entries are stored securely in Firestore and are only accessible through your authenticated account.',
     },
     {
-      'question': 'How do I register for a new account?',
+      'question': 'How do I register?',
       'answer':
-          'Tap the "Sign Up" button on the login screen.\nFill in your email and password details, then submit the form.\nYou will be registered and can use these credentials to log in.',
+          'On the login screen, tap "Sign Up", enter your details, and create your account.',
     },
     {
-      'question': 'How do I report a bug or suggest a feature?',
-      'answer':
-          'You can report bugs or suggest new features by contacting the support email provided in the app.',
+      'question': 'How do I report a bug or suggest features?',
+      'answer': 'Send your feedback to our support email mentioned below.',
     },
     {
-      'question': 'Can I edit or delete a journal entry after saving it?',
+      'question': 'Can I edit or delete a journal entry?',
       'answer':
-          'Currently, the app allows you to view journal entries, but editing or deleting them is not supported. Future updates may include this feature.',
+          'Yes! You can update or delete entries from the “View Journal” screen.',
     },
   ];
 
@@ -49,94 +48,98 @@ class Help extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF5F5DC),
+      backgroundColor: const Color(0xFFF5F5DC),
       appBar: AppBar(
-        title: Text('Help & Support'),
-        foregroundColor: Color(0xFFF5F5DC),
-        backgroundColor: Colors.brown,
+        title: const Text('Help & Support'),
         centerTitle: true,
+        foregroundColor: const Color(0xFFF5F5DC),
+        backgroundColor: Colors.brown,
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Frequently Asked Questions',
-                style: TextStyle(
-                  color: Colors.brown,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.brown,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Frequently Asked Questions',
+                  style: TextStyle(
+                    color: Colors.brown,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                    decorationColor: Colors.brown,
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: faqs.length,
-                itemBuilder: (context, index) {
-                  final faq = faqs[index];
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Q${index + 1}. ${faq['question']}',
-                        style: TextStyle(
-                          color: Colors.brown,
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        faq['answer']!,
-                        style: TextStyle(
-                          color: Colors.brown,
-                          fontSize: 16,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                      SizedBox(height: 20),
-                    ],
-                  );
-                },
-              ),
+                const SizedBox(height: 25),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: faqs.length,
+                  itemBuilder: (context, index) {
+                    final faq = faqs[index];
 
-              // Support Email
-              Divider(color: Colors.brown),
-              SizedBox(height: 10),
-              Text(
-                'Need More Help?',
-                style: TextStyle(
-                  color: Colors.brown,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 25),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Q${index + 1}. ${faq['question']}",
+                            style: const TextStyle(
+                              color: Colors.brown,
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            faq['answer']!,
+                            style: const TextStyle(
+                              color: Colors.brown,
+                              fontSize: 16,
+                              height: 1.4,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'If you encounter any issues or have suggestions, feel free to reach out to our support team:',
-                style: TextStyle(
-                  color: Colors.brown,
-                  fontSize: 16,
+                const Divider(color: Colors.brown, thickness: 1),
+                const SizedBox(height: 20),
+                const Text(
+                  'Need More Help?',
+                  style: TextStyle(
+                    color: Colors.brown,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                'Email: support@mypersonaljournalapp.com',
-                style: TextStyle(
-                  color: Colors.brown,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  fontStyle: FontStyle.italic,
+                const SizedBox(height: 10),
+                const Text(
+                  'If you encounter any issues or have suggestions, feel free to contact our support team:',
+                  style: TextStyle(
+                    color: Colors.brown,
+                    fontSize: 16,
+                    height: 1.4,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 10),
+                const Text(
+                  'Email: support@mypersonaljournalapp.com',
+                  style: TextStyle(
+                    color: Colors.brown,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

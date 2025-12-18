@@ -1,106 +1,133 @@
-import 'dart:io';
+import 'dart:io' show File;
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImagePickerLogic {
   static final picker = ImagePicker();
 
-  // image picker dialog
   static Future<void> openDialog(
-      BuildContext context, ValueChanged<File?> onImagePicked) async {
-    File? dialogImage;
+    BuildContext context,
+    Function(File? file, Uint8List? webImage) onImagePicked,
+  ) async {
+    File? previewFile;
+    Uint8List? previewWeb;
+
     await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return AlertDialog(
-              contentPadding: EdgeInsets.zero,
               backgroundColor: Colors.transparent,
+              elevation: 0,
+              contentPadding: EdgeInsets.zero,
               content: Container(
-                width: 300,
-                height: 400,
+                width: 320,
+                height: 420,
                 decoration: BoxDecoration(
-                  image: DecorationImage(
+                  image: const DecorationImage(
                     image: AssetImage('assets/imagebg.png'),
                     fit: BoxFit.cover,
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                padding: EdgeInsets.only(left: 30, top: 50, right: 30),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 26, vertical: 40),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    // IMAGE PICK AREA
                     InkWell(
+                      borderRadius: BorderRadius.circular(12),
                       onTap: () async {
                         final pickedFile = await picker.pickImage(
                           source: ImageSource.gallery,
                           imageQuality: 80,
                         );
+
                         if (pickedFile != null) {
-                          File image = File(pickedFile.path);
-                          setStateDialog(() {
-                            dialogImage = image; // Update image
-                          });
-                          onImagePicked(image);
+                          if (kIsWeb) {
+                            final bytes = await pickedFile.readAsBytes();
+                            setStateDialog(() => previewWeb = bytes);
+                            onImagePicked(null, bytes);
+                          } else {
+                            final file = File(pickedFile.path);
+                            setStateDialog(() => previewFile = file);
+                            onImagePicked(file, null);
+                          }
                         }
                       },
                       child: Container(
                         height: 200,
-                        width: 300,
+                        width: double.infinity,
                         decoration: BoxDecoration(
+                          color: Colors.black26,
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.white),
                         ),
-                        child: dialogImage != null
-                            ? Image.file(
-                                dialogImage!,
-                                fit: BoxFit.cover,
+                        child: previewWeb != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.memory(previewWeb!,
+                                    fit: BoxFit.cover),
                               )
-                            : Center(
-                                child: Icon(
-                                  Icons.add_a_photo_outlined,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                              ),
+                            : previewFile != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.file(previewFile!,
+                                        fit: BoxFit.cover),
+                                  )
+                                : const Center(
+                                    child: Icon(
+                                      Icons.add_a_photo_outlined,
+                                      color: Colors.white,
+                                      size: 32,
+                                    ),
+                                  ),
                       ),
                     ),
-                    SizedBox(height: 5),
-                    Text(
+
+                    const SizedBox(height: 12),
+                    const Text(
                       "Upload Image",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(height: 20),
+
+                    const Spacer(),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // CANCEL
                         ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Close the dialog
-                          },
+                          onPressed: () => Navigator.of(context).pop(),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.brown,
+                            backgroundColor: Colors.brown.shade600,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
+                                horizontal: 16, vertical: 10),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          icon: const Icon(
-                            Icons.cancel_outlined,
-                            color: Color(0xFFF5F5DC),
-                          ),
+                          icon: const Icon(Icons.cancel_outlined,
+                              color: Color(0xFFF5F5DC)),
                           label: const Text(
                             'Cancel',
                             style: TextStyle(
-                              fontSize: 16,
                               color: Color(0xFFF5F5DC),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
+
+                        // CONFIRM UPLOAD
                         ElevatedButton.icon(
                           onPressed: () {
                             Navigator.of(context).pop();
@@ -108,26 +135,23 @@ class ImagePickerLogic {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.brown,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
+                                horizontal: 16, vertical: 10),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          icon: const Icon(
-                            Icons.upload,
-                            color: Color(0xFFF5F5DC),
-                          ),
+                          icon: const Icon(Icons.upload,
+                              color: Color(0xFFF5F5DC)),
                           label: const Text(
                             'Upload',
                             style: TextStyle(
-                              fontSize: 16,
                               color: Color(0xFFF5F5DC),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ],
-                    ),
+                    )
                   ],
                 ),
               ),
