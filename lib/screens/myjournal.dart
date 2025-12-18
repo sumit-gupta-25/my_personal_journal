@@ -99,41 +99,45 @@ class MyJournalScreen extends StatelessWidget {
                         children: [
                           // UPDATE BUTTON
                           ElevatedButton(
-                            onPressed: () async {
-                              final updated = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => EditJournalScreen(
-                                    userId: userId,
-                                    journalId: formattedDate,
-                                    existingContent: data["Content"] ?? "",
+                              onPressed: () async {
+                                final updated = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => EditJournalScreen(
+                                      userId: userId,
+                                      journalId: formattedDate,
+                                      existingContent: data["Content"] ?? "",
+                                    ),
                                   ),
-                                ),
-                              );
+                                );
 
-                              // Refresh page after editing
-                              if (updated == true) {
-                                Navigator.pop(context);
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.brown[400],
-                            ),
-                            child: const Text("Update"),
-                          ),
+                                // Refresh page after editing
+                                if (updated == true) {
+                                  Navigator.pop(context);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.brown[400],
+                              ),
+                              child: const Text(
+                                "Update",
+                                style: TextStyle(color: Color(0xFFF5F5DC)),
+                              )),
 
                           // DELETE BUTTON
                           ElevatedButton(
-                            onPressed: () async {
-                              await DatabaseMethods()
-                                  .deleteJournal(userId, formattedDate);
-                              Navigator.pop(context);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.brown[400],
-                            ),
-                            child: const Text("Delete"),
-                          ),
+                              onPressed: () async {
+                                await DatabaseMethods()
+                                    .deleteJournal(userId, formattedDate);
+                                Navigator.pop(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.brown[400],
+                              ),
+                              child: const Text(
+                                "Delete",
+                                style: TextStyle(color: Color(0xFFF5F5DC)),
+                              )),
                         ],
                       ),
               ),
