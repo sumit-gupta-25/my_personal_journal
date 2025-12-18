@@ -1,10 +1,12 @@
-import 'dart:typed_data'; // Import for Uint8List
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../service/database.dart';
+import 'package:my_personal_journal/screens/edit_journal_screen.dart';
 
 class MyJournalScreen extends StatelessWidget {
   final DateTime selectedDate;
-  final String userId; // User ID passed as a parameter
+  final String userId;
 
   const MyJournalScreen({
     super.key,
@@ -12,12 +14,11 @@ class MyJournalScreen extends StatelessWidget {
     required this.userId,
   });
 
-  Future<Map<String, dynamic>?> _fetchJournalEntry() async {
-    String formattedDate =
-        "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+  String get formattedDate =>
+      "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
 
+  Future<Map<String, dynamic>?> _fetchJournalEntry() async {
     try {
-      // Firestore path: Users -> userId -> journals -> formattedDate
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('Users')
           .doc(userId)
@@ -25,11 +26,7 @@ class MyJournalScreen extends StatelessWidget {
           .doc(formattedDate)
           .get();
 
-      if (doc.exists) {
-        return doc.data() as Map<String, dynamic>;
-      } else {
-        return null;
-      }
+      return doc.exists ? doc.data() as Map<String, dynamic> : null;
     } catch (e) {
       throw Exception("Error fetching journal entry: $e");
     }
@@ -38,7 +35,7 @@ class MyJournalScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF5F5DC),
+      backgroundColor: const Color(0xFFF5F5DC),
       appBar: AppBar(
         title: const Text('My Journal Entry'),
         centerTitle: true,
@@ -50,67 +47,150 @@ class MyJournalScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: Text('No entry found for this date.'));
-          } else {
-            final data = snapshot.data!;
-            final String content = data['Content'] ?? 'No content available';
-
-            // Convert List<dynamic> to Uint8List
-            final List<dynamic>? imageList =
-                data['ImageBytes'] as List<dynamic>?;
-            final Uint8List? imageBytes = imageList != null
-                ? Uint8List.fromList(imageList.cast<int>())
-                : null;
-
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                      padding: EdgeInsets.only(left: 10, top: 10, right: 10),
-                      child: SingleChildScrollView(
-                        child: Stack(
-                          children: [
-                            Container(
-                              padding:
-                                  EdgeInsets.only(left: 10, top: 10, right: 10),
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage('assets/textbg.jpeg'),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              margin: EdgeInsets.only(left: 20, right: 20),
-                              height: 500,
-                              width: 370,
-                              child: Text(content,
-                                  style: TextStyle(
-                                    color: Color(0xFFF5F5DC),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  )),
-                            )
-                          ],
-                        ),
-                      )),
-                  const SizedBox(height: 20.0),
-                  imageBytes != null
-                      ? Image.memory(
-                          imageBytes,
-                          fit: BoxFit.contain,
-                          width: double.infinity,
-                          height: 200.0,
-                        )
-                      : const Text('No image available for this entry.'),
-                ],
-              ),
-            );
           }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          final data = snapshot.data;
+
+          return Column(
+            children: [
+              Expanded(
+                child: data == null
+                    ? const Center(
+                        child: Text(
+                          'No entry found for this date.',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      )
+                    : _buildJournalContent(data),
+              ),
+
+              /// ======================
+              /// BUTTON SECTION
+              /// ======================
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: data == null
+                    ? ElevatedButton(
+                        onPressed: () async {
+                          Map<String, dynamic> newEntry = {
+                            "date": formattedDate,
+                            "Content": "Write something...",
+                            "userId": userId,
+                          };
+
+                          await DatabaseMethods().addJournal(
+                            newEntry,
+                            userId,
+                            null,
+                          );
+
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                        ),
+                        child: const Text("Add Entry"),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          // UPDATE BUTTON
+                          ElevatedButton(
+                            onPressed: () async {
+                              final updated = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => EditJournalScreen(
+                                    userId: userId,
+                                    journalId: formattedDate,
+                                    existingContent: data["Content"] ?? "",
+                                  ),
+                                ),
+                              );
+
+                              // Refresh page after editing
+                              if (updated == true) {
+                                Navigator.pop(context);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.brown[400],
+                            ),
+                            child: const Text("Update"),
+                          ),
+
+                          // DELETE BUTTON
+                          ElevatedButton(
+                            onPressed: () async {
+                              await DatabaseMethods()
+                                  .deleteJournal(userId, formattedDate);
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.brown[400],
+                            ),
+                            child: const Text("Delete"),
+                          ),
+                        ],
+                      ),
+              ),
+            ],
+          );
         },
+      ),
+    );
+  }
+
+  /// ==========================
+  /// JOURNAL CONTENT WIDGET
+  /// ==========================
+  Widget _buildJournalContent(Map<String, dynamic> data) {
+    final String content = data['Content'] ?? 'No content available';
+
+    final List<dynamic>? imageList = data['ImageBytes'] as List<dynamic>?;
+    final Uint8List? imageBytes =
+        imageList != null ? Uint8List.fromList(imageList.cast<int>()) : null;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              height: 500,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                image: const DecorationImage(
+                  image: AssetImage('assets/textbg.jpeg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Text(
+                content,
+                style: const TextStyle(
+                  color: Color(0xFFF5F5DC),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            imageBytes != null
+                ? Image.memory(
+                    imageBytes,
+                    fit: BoxFit.contain,
+                    width: double.infinity,
+                    height: 200,
+                  )
+                : const Text("No image available for this entry."),
+          ],
+        ),
       ),
     );
   }

@@ -44,4 +44,28 @@ class DatabaseMethods {
       print("Error fetching entries: $e");
     }
   }
+
+  Future<void> updateJournal(
+    String userId,
+    String journalId,
+    Map<String, dynamic> updatedData,
+  ) async {
+    updatedData['userId'] = userId; // required by rules
+
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(userId)
+        .collection("journals")
+        .doc(journalId)
+        .set(updatedData, SetOptions(merge: true)); // <--- IMPORTANT
+  }
+
+  Future<void> deleteJournal(String userId, String journalId) async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(userId)
+        .collection("journals")
+        .doc(journalId)
+        .delete();
+  }
 }
