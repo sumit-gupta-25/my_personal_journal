@@ -9,11 +9,14 @@ class NavigationDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       width: 280,
+      backgroundColor: Colors.transparent, // IMPORTANT
       child: Container(
         decoration: const BoxDecoration(
+          color: Color(0xFF3E2C23), // fallback background
           image: DecorationImage(
-            image: AssetImage('assets/settingbg.jpeg'),
+            image: AssetImage('assets/setting_bg.jpeg'),
             fit: BoxFit.cover,
+            opacity: 0.9, // KEY FIX for web
           ),
         ),
         child: Column(
@@ -21,7 +24,7 @@ class NavigationDrawer extends StatelessWidget {
             _buildHeader(context),
             const Divider(
               color: Color(0xFFF5F5DC),
-              thickness: 0.3,
+              thickness: 0.5,
               indent: 16,
               endIndent: 16,
             ),
@@ -43,7 +46,7 @@ class NavigationDrawer extends StatelessWidget {
           SizedBox(
             height: 160,
             child: Image.asset(
-              "assets/hand&quill.png",
+              "assets/hand_quill.png",
               fit: BoxFit.contain,
             ),
           ),

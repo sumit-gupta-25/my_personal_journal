@@ -39,6 +39,7 @@ class MyDiaryState extends State<MyDiary> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        drawerScrimColor: Colors.black.withValues(alpha: 0.4),
         appBar: AppBar(
           title: const Text('My Diary'),
           centerTitle: true,

@@ -36,6 +36,7 @@ class MyHomeState extends State<MyHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5DC),
+      drawerScrimColor: Colors.black.withValues(alpha: 0.4),
       appBar: AppBar(
         title: const Text('Personal Journal'),
         centerTitle: true,
